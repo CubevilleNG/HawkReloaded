@@ -78,6 +78,10 @@ public class Util {
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
     }
 
+    public static void sendJsonMessage(CommandSender player, String msg) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + player.getName() + " " + msg);
+    }
+
     /**
      * Turns supplied location into a simplified (1 decimal point) version
      *

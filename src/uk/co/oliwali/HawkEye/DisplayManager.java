@@ -56,7 +56,8 @@ public class DisplayManager {
 
             String time = Util.getTime(entry.getTimestamp());
 
-            Util.sendMessage(session.getSender(), " &cID:" + entry.getDataId() + " &7" + time + "&c" + entry.getPlayer() + " &7" + entry.getType().getConfigName());
+            String jsonStr = "[\"\",{\"text\":\" ID:\",\"color\":\"red\"},{\"text\":\"" + entry.getDataId() + "\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/he tpto " + String.valueOf(entry.getDataId()) + "\"}},{\"text\":\" \"},{\"text\":\"" + time + "\",\"color\":\"gray\"},{\"text\":\" \"},{\"text\":\"" + entry.getPlayer() + "\",\"color\":\"red\"},{\"text\":\" \"},{\"text\":\"" + entry.getType().getConfigName() + "\",\"color\":\"gray\"}]";
+            Util.sendJsonMessage(session.getSender(), jsonStr);
             Util.sendMessage(session.getSender(), " &cLoc: &7" + entry.getWorld() + " " + entry.getX() + "," + entry.getY() + "," + entry.getZ() + " &cData: &7" + entry.getStringData());
         }
 
