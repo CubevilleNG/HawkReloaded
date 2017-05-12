@@ -79,7 +79,12 @@ public class Util {
     }
 
     public static void sendJsonMessage(CommandSender player, String msg) {
-        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + player.getName() + " " + msg);
+        Bukkit.getScheduler().runTask(HawkEye.getInstance(), new Runnable() {
+                final String playerName = player.getName();
+                public void run() {
+                    Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + playerName + " " + msg);
+                }
+            });
     }
 
     /**

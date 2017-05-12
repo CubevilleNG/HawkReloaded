@@ -136,11 +136,11 @@ public abstract class Query<C extends Callback<V>, V> extends Thread {
 
         try (Connection conn = dataManager.getConnectionManager().getConnection();
              PreparedStatement stmnt = queryBuilder.buildStatement(conn)) {
-
+            
             Util.debug(stmnt.toString());
-
+            
             callBack.call(executeQuery(conn, stmnt));
-
+            
         } catch (Exception ex) {
             Util.severe("Error executing MySQL query: " + ex);
             ex.printStackTrace();

@@ -3,6 +3,7 @@ package uk.co.oliwali.HawkEye;
 import uk.co.oliwali.HawkEye.entry.DataEntry;
 import uk.co.oliwali.HawkEye.util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,6 +12,18 @@ import java.util.List;
  * @author oliverw92
  */
 public class DisplayManager {
+
+    private static String toJson(String text, String color, String additionalParameter) {
+        text.replace("\"", ""); // TODO: escape properly
+        String ret = "{\"text\":\"" + text + "\",\"color\":\"" + color + "\"";
+        if(additionalParameter != null) ret += "," + additionalParameter;
+        ret += "}";
+        return ret;
+    }
+    
+    private static String toJson(String text, String color) {
+        return toJson(text, color, null);
+    }
 
     /**
      * Displays a page of data from the specified {@link PlayerSession} search results.
@@ -47,7 +60,16 @@ public class DisplayManager {
         String line = lineBuilder.toString();
 
         //Begin displaying page
-        Util.sendMessage(session.getSender(), "&8" + line + " &7Page (&c" + page + "&7/&c" + maxPages + "&7) &8" + line);
+        List<String> jsonBuilder = new ArrayList<>();
+
+        jsonBuilder.add(toJson(line + " ", "dark_gray"));
+        jsonBuilder.add(toJson("Page (", "gray"));
+        jsonBuilder.add(toJson(String.valueOf(page), "red"));
+        jsonBuilder.add(toJson("/", "gray"));
+        jsonBuilder.add(toJson(String.valueOf(maxPages), "red"));
+        jsonBuilder.add(toJson(") ", "gray"));
+        jsonBuilder.add(toJson(line + "\n", "dark_gray"));
+        //Util.sendMessage(session.getSender(), "&8" + line + " &7Page (&c" + page + "&7/&c" + maxPages + "&7) &8" + line);
 
         for (int i = (page - 1) * maxLines; i < ((page - 1) * maxLines) + maxLines; i++) {
             if (i == results.size())
@@ -56,12 +78,25 @@ public class DisplayManager {
 
             String time = Util.getTime(entry.getTimestamp());
 
-            String jsonStr = "[\"\",{\"text\":\" ID:\",\"color\":\"red\"},{\"text\":\"" + entry.getDataId() + "\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/he tpto " + String.valueOf(entry.getDataId()) + "\"}},{\"text\":\" \"},{\"text\":\"" + time + "\",\"color\":\"gray\"},{\"text\":\" \"},{\"text\":\"" + entry.getPlayer() + "\",\"color\":\"red\"},{\"text\":\" \"},{\"text\":\"" + entry.getType().getConfigName() + "\",\"color\":\"gray\"}]";
-            Util.sendJsonMessage(session.getSender(), jsonStr);
-            Util.sendMessage(session.getSender(), " &cLoc: &7" + entry.getWorld() + " " + entry.getX() + "," + entry.getY() + "," + entry.getZ() + " &cData: &7" + entry.getStringData());
-        }
+            jsonBuilder.add(toJson(" ID:", "red"));
+            jsonBuilder.add(toJson(String.valueOf(entry.getDataId()), "red", "\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/he tpto " + String.valueOf(entry.getDataId()) + "\"}"));
+            jsonBuilder.add(toJson(" " + time, "gray"));
+            jsonBuilder.add(toJson(" " + entry.getPlayer(), "red"));
+            jsonBuilder.add(toJson(" " + entry.getType().getConfigName() + "\n", "gray"));
 
-        Util.sendMessage(session.getSender(), "&8-----------------------------------------------------");
+            jsonBuilder.add(toJson(" Loc: ", "red"));
+            jsonBuilder.add(toJson(entry.getWorld() + " " + entry.getX() + "," + entry.getY() + "," + entry.getZ() + " ", "gray"));
+            jsonBuilder.add(toJson("Data: ", "red"));
+            jsonBuilder.add(toJson(entry.getStringData() + "\n", "gray"));
+        }
+        jsonBuilder.add(toJson("-----------------------------------------------------", "dark_gray"));
+        StringBuilder jsonStr = new StringBuilder();
+        for(int i = 0; i < jsonBuilder.size(); i++) {
+            if(i > 0) jsonStr.append(",");
+            jsonStr.append(jsonBuilder.get(i));
+        }
+        String jsonString = "[\"\"," + jsonStr.toString() + "]";
+        Util.sendJsonMessage(session.getSender(), jsonString);
     }
 
 }
